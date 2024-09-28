@@ -39,7 +39,12 @@ class Sponsors(models.Model):
         db_table = 'Sponsors'
 
     def __str__(self):
-        return f'{self.id}. Sponsor {self.name} - {'Activo' if self.is_active else 'Inactivo'}'
+        if self.is_active:
+            active = 'Activo'
+        else:
+            active = 'Inactivo'
+        
+        return f'{self.id}. Sponsor {self.name} - {active}'
     
     def _to_json(self):
         return {
@@ -105,11 +110,11 @@ class Categories(models.Model):
     def __str__(self):
         return f'{self.id}. {self.name} category'
     
-    def _to_json(self):
+    def _to_json(self): 
         return {
             "id": self.id,
             "name": self.name,
-            "trainer": self.trainer._to_json() if self.trainer else {},
+            "trainer": self.trainer._to_json(),
             "delegate": self.delegate._to_json() if self.delegate else {},
             "image": self.image
         }
@@ -162,15 +167,24 @@ class Matches(models.Model):
 
     def __str__(self):
         match = self._to_json()
-        local = match.get('local')
-        visitant = match.get('visitant')
-        
-        return f'{self.id}. {local.get('name')} vs {visitant.get('name')} {f'{local.get('score')} - {visitant.get('score')}' if self.show_result else ''}'
+        local:dict = match.get('local')
+        visitant:dict  = match.get('visitant')
+        localname = local.get('name')
+        localscore = local.get('score')
+        visitantname = local.get('name')
+        visitantscore = visitant.get('score')
+
+        return f'{self.id}. {localname} vs {visitantname} {localscore} - {visitantscore}'
     
     def _to_json(self):
         
         judesa_name = 'CD Judesa FS' 
-        
+        time = f'{self.match_date.time().hour}:'
+        if self.match_date.time().minute < 10:
+            time += self.match_date.time().minute
+        else:
+            time += '0' + str(self.match_date.time().minute)
+            
         return {
             "id": self.id,
             "local": {
@@ -184,9 +198,9 @@ class Matches(models.Model):
             "match_date": {
                 "extended": self.match_date,
                 "date": self.match_date.date(),
-                    "time": f'{self.match_date.time().hour}:{f'0{self.match_date.time().minute}' if self.match_date.time().minute < 10 else self.match_date.time().minute}' 
+                    "time": time
             },
             "show_result": self.show_result,
             "is_local": self.is_local,
             "location": self.location
-        }
+         }
