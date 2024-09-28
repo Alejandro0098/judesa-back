@@ -3,8 +3,8 @@ from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from decouple import config
 
-DJANGO_SUPERUSER_PASSWORD = config('DJANGO_SUPERUSER_PASSWORD')
-DJANGO_SUPERUSER_USERNAME = config('DJANGO_SUPERUSER_USERNAME')
+DJANGO_SUPEUSER_USERNAME = config('DJANGO_SUPEUSER_USERNAME')
+DJANGO_SUPERUSER_USERNAME = config('DJANGO_SUPEUSER_PASSWORD')
 DJANGO_SUPERUSER_EMAIL = config('DJANGO_SUPERUSER_EMAIL')
 
 User = get_user_model()
