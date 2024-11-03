@@ -92,8 +92,6 @@ def home(request):
     sponsors = get_sponsors()
     categories = get_categories()
     
-    time.sleep(2)
-    
     return JsonResponse(data={"ok": True, "data":
         {
             "news": latest_news,
@@ -118,8 +116,7 @@ def category_by_id(request, id):
     matches = get_matches_by_category_id(id)
     
     players = get_players_by_category_id(id)
-    
-    time.sleep(2)
+
     
     return JsonResponse({
             "ok": True,

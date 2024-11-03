@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib import admin
 
 class News(models.Model):
     id = models.AutoField(primary_key=True, auto_created=True)
@@ -10,9 +11,10 @@ class News(models.Model):
 
     class Meta:
         db_table = 'News'
+        verbose_name_plural = 'Noticias'
 
     def __str__(self):
-        return f'New {self.id} - {self.creation_date.date()}'
+        return f'Noticia {self.id} - {self.creation_date.date()}'
     
     def _to_json(self):
         return {
@@ -37,6 +39,7 @@ class Sponsors(models.Model):
 
     class Meta:
         db_table = 'Sponsors'
+        verbose_name_plural = 'Patrocinadores'
 
     def __str__(self):
         if self.is_active:
@@ -44,7 +47,7 @@ class Sponsors(models.Model):
         else:
             active = 'Inactivo'
         
-        return f'{self.id}. Sponsor {self.name} - {active}'
+        return f'{self.id}. Patrocinador {self.name} - {active}'
     
     def _to_json(self):
         return {
@@ -67,6 +70,7 @@ class Products(models.Model):
 
     class Meta:
         db_table = 'Products'
+        verbose_name_plural = 'Productos'
 
     def __str__(self):
         return f'{self.id}. {self.name}'
@@ -81,6 +85,7 @@ class Staff(models.Model):
     
     class Meta:
         db_table = 'Staff'
+        verbose_name_plural = 'Staff'
 
     def __str__(self):
         return f'{self.id}. {self.name}'
@@ -106,9 +111,10 @@ class Categories(models.Model):
     
     class Meta:
         db_table = 'Categories'
+        verbose_name_plural = 'Categorías'
 
     def __str__(self):
-        return f'{self.id}. {self.name} category'
+        return f'Categoría {self.name}'
     
     def _to_json(self): 
         return {
@@ -135,6 +141,7 @@ class Players(models.Model):
 
     class Meta:
         db_table = 'Players'
+        verbose_name_plural = 'Jugadores'
 
     def __str__(self):
         return f'{self.id}. {self.name} - #{self.dorsal}'
@@ -153,35 +160,41 @@ class Players(models.Model):
 
 class Matches(models.Model):
     id = models.AutoField(primary_key=True)
-    category_id = models.ForeignKey(Categories, on_delete=models.SET_NULL, related_name='category_id_matches', null=True)
+    category_id = models.ForeignKey(Categories, on_delete=models.SET_NULL, related_name='category_id_matches', null=True, verbose_name='categoría')
     location = models.CharField(null=False, unique=True, max_length=150, default='')
     rival = models.CharField(null=False, max_length=150)
     local_score = models.PositiveIntegerField(default=0)
     visitant_score = models.PositiveIntegerField(default=0)
-    match_date = models.DateTimeField(null=False)
+    match_date = models.DateTimeField(null=False, verbose_name="fecha")
     is_local = models.BooleanField(default=True)
     show_result = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'Matches'
+        verbose_name_plural = 'Partidos'
+        verbose_name = 'Partido'
+        
 
     def __str__(self):
         match = self._to_json()
-        local:dict = match.get('local')
-        visitant:dict  = match.get('visitant')
-        localname = local.get('name')
+        local = match.get('local')
+        visitant  = match.get('visitant')
         localscore = local.get('score')
-        visitantname = local.get('name')
         visitantscore = visitant.get('score')
 
-        return f'{self.id}. {localname} vs {visitantname} {localscore} - {visitantscore}'
+        result = f'vs {self.rival}'
+
+        if self.show_result:
+            result += f' --> {localscore} - {visitantscore}'
+        
+        return result
     
     def _to_json(self):
         
         judesa_name = 'CD Judesa FS' 
         time = f'{self.match_date.time().hour}:'
         if self.match_date.time().minute < 10:
-            time += self.match_date.time().minute
+            time += str(self.match_date.time().minute)
         else:
             time += '0' + str(self.match_date.time().minute)
             
