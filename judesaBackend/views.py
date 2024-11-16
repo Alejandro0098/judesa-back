@@ -1,6 +1,12 @@
 from .models import News, Sponsors, Categories, Matches, Players
 from django.http import JsonResponse, HttpRequest
 import time
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+    
+date_after_month = datetime.today()+ relativedelta(months=1)
+print('Today: ',datetime.today().strftime('%d/%m/%Y'))
+print('After Month:', date_after_month.strftime('%d/%m/%Y'))
 
 AMOUNT_OF_LATEST_NEWS = 3
     
@@ -43,6 +49,15 @@ def get_sponsors():
 
 def get_matches_by_category_id(id):
     return list(map(lambda sponsor: sponsor._to_json(), Matches.objects.filter(category_id=id).order_by("-match_date")))
+
+
+def get_next_matches():
+    start_date = datetime.today()
+    end_date = datetime.today() + relativedelta(months=1)
+    print('Today: ', start_date.strftime('%d/%m/%Y'))
+    print('After Month:', end_date.strftime('%d/%m/%Y'))
+    return [ match._to_json() for match in Matches.objects.filter(match_date__range=(start_date, end_date)) ]
+
 
 def get_players_by_category_id(id):
     return list(map(lambda sponsor: sponsor._to_json(), Players.objects.filter(category_id=id, is_active=True)))
@@ -91,7 +106,7 @@ def home(request):
     latest_news = [new._to_json() for new in get_latest_news()]
     sponsors = get_sponsors()
     categories = get_categories()
-    
+    time.sleep(5)
     return JsonResponse(data={"ok": True, "data":
         {
             "news": latest_news,
@@ -117,7 +132,6 @@ def category_by_id(request, id):
     
     players = get_players_by_category_id(id)
 
-    
     return JsonResponse({
             "ok": True,
             "data": {
@@ -132,7 +146,17 @@ def category_by_id(request, id):
                 } 
             }
         })
+
+
+def next_matches(request):
+    return JsonResponse({"ok": True, "data": get_next_matches()})
+
+
+def latest_news(request):
+    latest_news = [new._to_json() for new in get_latest_news()]
     
+    return JsonResponse({"ok": True, "data": latest_news})
+
 
 # def insert_new(request):
 #     new = News(title='title2', subtitle='2', date='dat2e2')

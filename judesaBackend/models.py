@@ -25,7 +25,7 @@ class News(models.Model):
                 "creation_date": self.creation_date.date(),
                 "image": self.preview_image,
             },
-            "tags": self.tags['tags']
+            "tags": self.tags
         }
         
 
@@ -176,43 +176,29 @@ class Matches(models.Model):
         
 
     def __str__(self):
-        match = self._to_json()
-        local = match.get('local')
-        visitant  = match.get('visitant')
-        localscore = local.get('score')
-        visitantscore = visitant.get('score')
 
         result = f'vs {self.rival}'
 
         if self.show_result:
-            result += f' --> {localscore} - {visitantscore}'
+            result += f' --> {self.local_score} - {self.visitant_score}'
         
         return result
     
     def _to_json(self):
-        
-        judesa_name = 'CD Judesa FS' 
+
         time = f'{self.match_date.time().hour}:'
-        if self.match_date.time().minute < 10:
+        if self.match_date.time().minute > 10:
             time += str(self.match_date.time().minute)
         else:
             time += '0' + str(self.match_date.time().minute)
             
         return {
             "id": self.id,
-            "local": {
-                "name": judesa_name if self.is_local else self.rival,
-                "score": self.local_score
-            },
-            "visitant": {
-                "name": judesa_name if not self.is_local else self.rival,
-                "score": self.visitant_score
-            }, 
-            "match_date": {
-                "extended": self.match_date,
-                "date": self.match_date.date(),
-                    "time": time
-            },
+            "category": self.category_id.name,
+            "date": self.match_date.date().strftime('%d-%m-%Y'),
+            "time": time,
+            "rival": self.rival,
+            "result": str(self.local_score) + '-' + str(self.visitant_score),
             "show_result": self.show_result,
             "is_local": self.is_local,
             "location": self.location
