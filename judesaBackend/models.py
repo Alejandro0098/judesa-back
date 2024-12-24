@@ -14,7 +14,7 @@ class News(models.Model):
         verbose_name_plural = 'Noticias'
 
     def __str__(self):
-        return f'Noticia {self.id} - {self.creation_date.date()}'
+        return f'Noticia {self.id} - {self.creation_date.date().strftime('%d/%m/%Y')}'
     
     def _to_json(self):
         return {
@@ -22,7 +22,7 @@ class News(models.Model):
                 "id": self.id,
                 "title": self.title,
                 "subtitle": self.subtitle,
-                "creation_date": self.creation_date.date(),
+                "creation_date": self.creation_date.date().strftime('%d/%m/%Y'),
                 "image": self.preview_image,
             },
             "tags": self.tags
@@ -195,7 +195,7 @@ class Matches(models.Model):
         return {
             "id": self.id,
             "category": self.category_id.name,
-            "date": self.match_date.date().strftime('%d-%m-%Y'),
+            "date": self.match_date.date().strftime('%d/%m/%Y'),
             "time": time,
             "rival": self.rival,
             "result": str(self.local_score) + '-' + str(self.visitant_score),

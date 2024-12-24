@@ -1,0 +1,7 @@
+# Backup all information in backup.json file
+
+python manage.py dumpdata --format=json --indent=4 > judesaBackend/fixtures/20241224.json
+
+# Load data from backup.json file (need "fixture" folder)
+
+python manage.py loaddata backup.json

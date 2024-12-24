@@ -48,15 +48,14 @@ def get_sponsors():
 
 
 def get_matches_by_category_id(id):
-    return list(map(lambda sponsor: sponsor._to_json(), Matches.objects.filter(category_id=id).order_by("-match_date")))
+    return list(map(lambda sponsor: sponsor._to_json(), Matches.objects.filter(category_id=id).order_by("match_date")))
 
 
 def get_next_matches():
     start_date = datetime.today()
     end_date = datetime.today() + relativedelta(months=1)
-    print('Today: ', start_date.strftime('%d/%m/%Y'))
-    print('After Month:', end_date.strftime('%d/%m/%Y'))
-    return [ match._to_json() for match in Matches.objects.filter(match_date__range=(start_date, end_date)) ]
+    # return [ match._to_json() for match in Matches.objects.filter(match_date__range=(start_date, end_date)) ]
+    return [ match._to_json() for match in Matches.objects.all() ]
 
 
 def get_players_by_category_id(id):
